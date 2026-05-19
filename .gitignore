@@ -1,0 +1,26 @@
+# Archivos generados por el scraper
+productos_*.csv
+
+# Entorno virtual de Python
+venv/
+.env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de dependencias
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Archivos de prueba
+test_*.py
