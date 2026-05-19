@@ -1,8 +1,10 @@
 # Archivos generados por el scraper
 productos_*.csv
+*.png
 
 # Entorno virtual de Python
 venv/
+.venv/
 .env/
 __pycache__/
 *.py[cod]

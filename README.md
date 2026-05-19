@@ -22,7 +22,7 @@ Este script permite extraer datos de productos de diversas categorías desde una
 ## 📦 Requisitos
 
 - Python 3.7 o superior
-- Biblioteca `requests` (se instala automáticamente si no está presente)
+- Bibliotecas: `requests`, `matplotlib`
 
 ## 🛠️ Instalación
 
@@ -32,10 +32,19 @@ git clone https://github.com/pierotticastillo/dummyjson-product-scraper.git
 cd dummyjson-product-scraper
 ```
 
-2. Instala las dependencias:
+2. Crea y activa un entorno virtual (recomendado):
 ```bash
-pip install requests
+python3 -m venv .venv
+source .venv/bin/activate
 ```
+
+3. Instala las dependencias desde `requirements.txt`:
+```bash
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+```
+
+> Si tu sistema usa Python gestionado por el paquete del sistema (`externally-managed-environment`), no instales paquetes globalmente con `pip install` fuera de un entorno virtual.
 
 ## 📖 Uso
 

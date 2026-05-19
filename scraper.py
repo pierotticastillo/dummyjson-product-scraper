@@ -33,6 +33,11 @@ import csv
 import sys
 import argparse
 from datetime import datetime
+try:
+    import matplotlib.pyplot as plt
+    _HAS_MPL = True
+except Exception:
+    _HAS_MPL = False
 
 
 # URL base de la API pública dummyjson.com
@@ -203,6 +208,47 @@ def guardar_csv(productos: list[dict], categoria: str) -> str:
     return nombre
 
 
+def plot_product_stats(productos: list[dict], categoria: str) -> str:
+    """
+    Genera y guarda gráficos básicos de los productos (histograma de precios y
+    scatter precio vs rating). Devuelve el nombre del archivo PNG generado.
+    Si `matplotlib` no está disponible, sale sin error.
+    """
+    if not _HAS_MPL:
+        print("⚠️ matplotlib no está instalado; omitiendo gráficos.")
+        return ""
+
+    precios = [p["precio_final_usd"] for p in productos if p["precio_final_usd"] > 0]
+    ratings = [p["rating"] for p in productos if p["rating"] > 0]
+
+    if not precios:
+        print("⚠️ No hay datos para graficar.")
+        return ""
+
+    nombre_plot = f"productos_{categoria.replace(' ', '_')}_{datetime.now().strftime('%Y-%m-%d')}.png"
+
+    fig, axs = plt.subplots(1, 2, figsize=(12, 5))
+    # Histograma de precios
+    axs[0].hist(precios, bins=10, color='C0', edgecolor='black')
+    axs[0].set_title("Distribución de precios (USD)")
+    axs[0].set_xlabel("Precio (USD)")
+    axs[0].set_ylabel("Frecuencia")
+
+    # Scatter precio vs rating
+    axs[1].scatter(precios, ratings, alpha=0.7)
+    axs[1].set_title("Precio vs Rating")
+    axs[1].set_xlabel("Precio (USD)")
+    axs[1].set_ylabel("Rating")
+
+    plt.suptitle(f"Productos - {categoria}")
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.savefig(nombre_plot)
+    plt.close(fig)
+
+    print(f"  📈 Gráfico guardado en: {nombre_plot}")
+    return nombre_plot
+
+
 def main():
     """
     Función principal del script.
@@ -240,6 +286,11 @@ def main():
     archivo = guardar_csv(productos, args.categoria)
     print(f"  💾 Guardado en: {archivo}")
     print(f"     Abrilo con: libreoffice --calc {archivo}\n")
+    # Intentar generar gráficos (si matplotlib está disponible)
+    try:
+        plot_product_stats(productos, args.categoria)
+    except Exception as e:
+        print(f"⚠️ Error al generar gráfico: {e}")
 
 
 if __name__ == "__main__":
