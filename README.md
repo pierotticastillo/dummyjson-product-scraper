@@ -2,22 +2,26 @@
 
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Tests](https://img.shields.io/badge/tests-27%20passing-brightgreen.svg)
 
-Un scraper de productos que extrae datos de la API pública [dummyjson.com](https://dummyjson.com/) para análisis y exportación a CSV.
+Un scraper de productos que extrae datos de la API pública [dummyjson.com](https://dummyjson.com/) para análisis, visualización y exportación a CSV.
 
 ## 📋 Descripción
 
-Este script permite extraer datos de productos de diversas categorías desde una API pública, procesar la información (calcular precios con descuentos), generar análisis estadísticos y exportar los resultados a archivos CSV.
+Este proyecto permite extraer datos de productos de diversas categorías desde una API pública, procesar la información (calcular precios con descuentos), generar análisis estadísticos, visualizar tendencias, comparar precios en el tiempo y exportar los resultados a archivos CSV.
 
 ## 🚀 Características
 
 - ✅ Búsqueda de productos por categoría o todos los productos
 - ✅ Cálculo automático de precios con descuentos aplicados
 - ✅ Análisis estadístico completo (precios, ratings, stock)
+- ✅ Top 5 productos más baratos y mejor valorados
 - ✅ Exportación a CSV con formato estructurado
+- ✅ Historial de precios y comparación entre fechas (`--comparar`)
+- ✅ Gráficos de tendencias de precios en el tiempo (`--tendencias`)
+- ✅ Distribución de precios y scatter precio vs rating (gráficos PNG)
 - ✅ Manejo robusto de errores (conexión, categorías inválidas)
 - ✅ Lista de categorías disponibles
-- ✅ Top 5 productos más baratos y mejor valorados
 
 ## 📦 Requisitos
 
@@ -72,6 +76,30 @@ python3 scraper.py smartphones --cantidad 50
 
 # Obtener 100 productos de todas las categorías
 python3 scraper.py all --cantidad 100
+
+# Comparar precios actuales vs historial guardado
+python3 scraper.py smartphones --comparar
+
+# Generar gráfico de tendencias de precios
+python3 scraper.py smartphones --tendencias
+
+# Combinar flags
+python3 scraper.py laptops --comparar --tendencias --cantidad 30
+
+# Activar logs de depuración
+python3 scraper.py smartphones -v
+```
+
+### Demo rápido
+
+```bash
+# Generar datos de historial simulados y probar comparación
+python3 demo_price_comparison.py
+python3 scraper.py smartphones --comparar
+
+# O usar datos reales de la API con precios simulados
+python3 demo_price_comparison_real.py
+python3 scraper.py smartphones --tendencias
 ```
 
 ## 📊 Salida
@@ -89,6 +117,15 @@ El script genera:
 2. **Archivo CSV**:
    - Nombre: `productos_{categoria}_{YYYY-MM-DD}.csv`
    - Campos: título, marca, categoría, precios, descuentos, rating, stock, descripción, fecha
+
+3. **Gráficos PNG** (si `matplotlib` está instalado):
+   - Histograma de distribución de precios
+   - Scatter precio vs rating
+   - Líneas de tendencia de precios en el tiempo (con `--tendencias`)
+
+4. **Historial de precios** (en `price_history/price_history.json`):
+   - Almacena precios actuales para comparaciones futuras
+   - Se usa con el flag `--comparar`
 
 ## 🎯 Ejemplo de salida CSV
 
@@ -108,9 +145,32 @@ iPhone 13 Pro;Apple;smartphones;1099.99;9.37;996.92;4.12;56;"The iPhone 13 Pro i
 
 ```
 dummyjson-product-scraper/
-├── scraper.py          # Script principal
-├── README.md           # Este archivo
-└── productos_*.csv     # Archivos CSV generados
+├── scraper.py              # Entry point (thin wrapper)
+├── src/
+│   ├── __init__.py
+│   ├── config.py           # Constantes de configuración
+│   ├── models.py           # Dataclass Product
+│   ├── api.py              # Cliente API dummyjson.com
+│   ├── history.py          # Historial y comparación de precios
+│   ├── analysis.py         # Estadísticas y resúmenes
+│   ├── export.py           # Exportación a CSV
+│   ├── visualization.py    # Gráficos con matplotlib
+│   └── cli.py              # Interfaz de línea de comandos
+├── tests/
+│   ├── __init__.py
+│   ├── test_models.py
+│   ├── test_api.py
+│   ├── test_history.py
+│   ├── test_analysis.py
+│   └── test_export.py
+├── demo_price_comparison.py      # Demo con datos simulados
+├── demo_price_comparison_real.py # Demo con productos reales de la API
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── price_history/                # Historial de precios (generado)
+│   └── price_history.json
+└── productos_*.csv               # Archivos CSV generados
 ```
 
 ## 📝 Campos del producto
@@ -127,6 +187,30 @@ dummyjson-product-scraper/
 | stock               | Unidades disponibles                         | integer   |
 | descripcion         | Descripción truncada (80 caracteres)          | string    |
 | fecha_busqueda      | Fecha y hora de la búsqueda                  | datetime  |
+
+## 🧪 Tests
+
+El proyecto incluye **27 tests unitarios** con pytest:
+
+```bash
+# Activar el entorno virtual e instalar dependencias
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Ejecutar todos los tests
+python3 -m pytest tests/ -v
+
+# Ejecutar tests con cobertura
+python3 -m pip install pytest-cov
+python3 -m pytest tests/ --cov=src
+```
+
+Los tests cubren:
+- **models**: creación de `Product` desde API, cálculo de precios con descuento
+- **api**: mocking de requests HTTP, manejo de errores (conexión, 404, 500)
+- **analysis**: estadísticas descriptivas, top productos
+- **history**: comparación de precios entre fechas, productos nuevos/ausentes
+- **export**: generación de archivos CSV con contenido correcto
 
 ## 🤝 Contribución
 

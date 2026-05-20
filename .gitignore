@@ -24,5 +24,11 @@ Thumbs.db
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Archivos de prueba
-test_*.py
+# Archivos de prueba (solo raíz, no tests/ anidados)
+/test_*.py
+
+# Historial de precios generado
+price_history/
+
+# Caché de pytest
+.pytest_cache/
